@@ -4,498 +4,385 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Social TikTok — Odoo 19</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --black:  #010101;
-      --cyan:   #69C9D0;
-      --red:    #EE1D52;
-      --white:  #ffffff;
-      --gray:   #8a8a9a;
-      --surface:#0d0d18;
-      --card-bg:#13131f;
-      --border: rgba(105,201,208,.18);
-    }
-
-    body {
-      font-family: 'Segoe UI', system-ui, Arial, sans-serif;
-      background: #fff;
-      color: #1a1a2e;
-      overflow-x: hidden;
-    }
-
-    a { color: var(--cyan); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    /* ── HERO ────────────────────────────────── */
-    .hero {
-      position: relative;
-      background: var(--black);
-      overflow: hidden;
-      padding: 80px 40px 90px;
-      text-align: center;
-    }
-
-    /* animated gradient orbs */
-    .hero::before,
-    .hero::after {
-      content: '';
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      pointer-events: none;
-      animation: drift 8s ease-in-out infinite alternate;
-    }
-    .hero::before {
-      width: 520px; height: 520px;
-      background: radial-gradient(circle, rgba(238,29,82,.35) 0%, transparent 70%);
-      top: -180px; left: -120px;
-    }
-    .hero::after {
-      width: 480px; height: 480px;
-      background: radial-gradient(circle, rgba(105,201,208,.30) 0%, transparent 70%);
-      bottom: -160px; right: -100px;
-      animation-delay: -4s;
-    }
-
-    @keyframes drift {
-      from { transform: translate(0, 0)   scale(1); }
-      to   { transform: translate(30px, 20px) scale(1.05); }
-    }
-
-    /* floating grid pattern */
-    .hero-grid {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(105,201,208,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(105,201,208,.04) 1px, transparent 1px);
-      background-size: 48px 48px;
-    }
-
-    .hero-inner { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; }
-
-    /* pill badge */
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(105,201,208,.35);
-      border-radius: 999px;
-      padding: 8px 20px;
-      margin-bottom: 36px;
-    }
-    .hero-badge img { width: 22px; height: 22px; }
-    .hero-badge span {
-      font-size: 11px;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: var(--cyan);
-      font-weight: 600;
-    }
-
-    /* headline */
-    .hero h1 {
-      font-size: clamp(44px, 7vw, 72px);
-      font-weight: 900;
-      line-height: 1.05;
-      letter-spacing: -1.5px;
-      color: var(--white);
-      margin-bottom: 22px;
-    }
-    .hero h1 .grad {
-      background: linear-gradient(90deg, var(--red) 0%, var(--cyan) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-sub {
-      font-size: 17px;
-      color: #9090a8;
-      max-width: 580px;
-      margin: 0 auto 44px;
-      line-height: 1.75;
-    }
-
-    /* stat row */
-    .hero-stats {
-      display: flex;
-      justify-content: center;
-      gap: 0;
-      margin-bottom: 44px;
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 16px;
-      overflow: hidden;
-      max-width: 540px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .hero-stat {
-      flex: 1;
-      padding: 20px 10px;
-      border-right: 1px solid rgba(255,255,255,.07);
-    }
-    .hero-stat:last-child { border-right: none; }
-    .hero-stat .val {
-      font-size: 26px;
-      font-weight: 800;
-      color: var(--white);
-      display: block;
-      line-height: 1;
-      margin-bottom: 5px;
-    }
-    .hero-stat .lbl {
-      font-size: 11px;
-      color: var(--gray);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* pills */
-    .hero-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-    }
-    .hero-pills span {
-      background: rgba(105,201,208,.08);
-      border: 1px solid rgba(105,201,208,.28);
-      color: var(--cyan);
-      border-radius: 999px;
-      padding: 7px 18px;
-      font-size: 12.5px;
-      font-weight: 500;
-    }
-
-    /* ── SECTION SCAFFOLD ───────────────────── */
-    .wrap {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 72px 36px;
-    }
-
-    .sec-head {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 40px;
-    }
-    .sec-line {
-      width: 4px;
-      height: 48px;
-      border-radius: 4px;
-      background: linear-gradient(180deg, var(--red) 0%, var(--cyan) 100%);
-      flex-shrink: 0;
-      margin-top: 3px;
-    }
-    .sec-head h2 {
-      font-size: 30px;
-      font-weight: 800;
-      color: #0d0d18;
-      letter-spacing: -.4px;
-      line-height: 1.1;
-    }
-    .sec-head p {
-      font-size: 14px;
-      color: var(--gray);
-      margin-top: 5px;
-    }
-
-    hr.sep {
-      border: none;
-      border-top: 1px solid #f0f0f5;
-    }
-
-    /* ── FEATURES ───────────────────────────── */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-      gap: 18px;
-    }
-
-    .feat {
-      border: 1px solid #ebebf2;
-      border-radius: 16px;
-      padding: 26px 22px;
-      background: #fff;
-      position: relative;
-      overflow: hidden;
-      transition: transform .2s, box-shadow .2s, border-color .2s;
-    }
-    .feat::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(238,29,82,.04) 0%, rgba(105,201,208,.04) 100%);
-      opacity: 0;
-      transition: opacity .2s;
-    }
-    .feat:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(0,0,0,.09); border-color: rgba(105,201,208,.4); }
-    .feat:hover::before { opacity: 1; }
-
-    .feat-icon {
-      width: 48px; height: 48px;
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
-      margin-bottom: 16px;
-    }
-    .feat-icon.red  { background: rgba(238,29,82,.1); }
-    .feat-icon.cyan { background: rgba(105,201,208,.12); }
-    .feat-icon.mix  { background: linear-gradient(135deg, rgba(238,29,82,.08), rgba(105,201,208,.1)); }
-
-    .feat h3 { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 8px; }
-    .feat p  { font-size: 13px; color: #686880; line-height: 1.65; }
-
-    /* ── TIMELINE (install / config) ────────── */
-    .timeline { display: flex; flex-direction: column; gap: 0; }
-
-    .tl-item {
-      display: grid;
-      grid-template-columns: 56px 1fr;
-      gap: 0 20px;
-      position: relative;
-    }
-
-    /* vertical connector */
-    .tl-item:not(:last-child) .tl-left::after {
-      content: '';
-      position: absolute;
-      top: 52px;
-      left: 27px;
-      width: 2px;
-      height: calc(100% - 10px);
-      background: linear-gradient(180deg, var(--red) 0%, var(--cyan) 100%);
-      opacity: .2;
-    }
-
-    .tl-left {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-      padding-top: 24px;
-    }
-
-    .tl-num {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: var(--black);
-      color: var(--cyan);
-      font-weight: 800;
-      font-size: 16px;
-      display: flex; align-items: center; justify-content: center;
-      border: 2px solid rgba(105,201,208,.35);
-      flex-shrink: 0;
-      z-index: 1;
-    }
-
-    .tl-body {
-      padding: 24px 24px 32px 0;
-    }
-    .tl-body h4 {
-      font-size: 16px;
-      font-weight: 700;
-      color: #0d0d18;
-      margin-bottom: 8px;
-    }
-    .tl-body p {
-      font-size: 13.5px;
-      color: #5a5a72;
-      line-height: 1.7;
-    }
-
-    code {
-      background: #f4f4f8;
-      border: 1px solid #e0e0e8;
-      border-radius: 5px;
-      padding: 2px 7px;
-      font-size: 12px;
-      font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
-      color: #d63384;
-    }
-
-    /* ── REQUIREMENTS TABLE ─────────────────── */
-    .req-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: 14px;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1px solid #e8e8f0;
-    }
-    .req-table thead tr {
-      background: var(--black);
-    }
-    .req-table th {
-      padding: 14px 20px;
-      text-align: left;
-      color: var(--cyan);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-    .req-table td {
-      padding: 14px 20px;
-      border-bottom: 1px solid #f0f0f5;
-      color: #3a3a52;
-      vertical-align: top;
-    }
-    .req-table tbody tr:last-child td { border-bottom: none; }
-    .req-table tbody tr:nth-child(even) td { background: #fafafe; }
-    .req-table tbody tr:hover td { background: #f4f4fb; }
-    .req-table td strong { color: #111; font-weight: 600; }
-
-    /* ── LIMITATIONS ────────────────────────── */
-    .lims {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-    }
-
-    .lim {
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-      padding: 20px;
-      border-radius: 14px;
-      border: 1px solid #ffe8b0;
-      background: linear-gradient(135deg, #fffdf4 0%, #fffbea 100%);
-    }
-
-    .lim-icon {
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      background: rgba(238,29,82,.08);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-
-    .lim h5 { font-size: 13.5px; font-weight: 700; color: #2a2a3a; margin-bottom: 5px; }
-    .lim p  { font-size: 12.5px; color: #6a6a7a; line-height: 1.6; }
-
-    /* ── LICENSE ────────────────────────────── */
-    .license-wrap {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .license-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--black);
-      color: var(--cyan);
-      border-radius: 8px;
-      padding: 10px 20px;
-      font-size: 14px;
-      font-weight: 700;
-      border: 1px solid rgba(105,201,208,.3);
-    }
-    .license-badge .dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--cyan);
-      display: inline-block;
-    }
-    .license-note {
-      font-size: 13px;
-      color: var(--gray);
-    }
-
-    /* ── FOOTER ─────────────────────────────── */
-    .footer {
-      background: var(--black);
-      padding: 40px 40px;
-    }
-    .footer-inner {
-      max-width: 980px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-    .footer-brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .footer-brand img {
-      width: 36px; height: 36px;
-      border-radius: 8px;
-    }
-    .footer-brand-text strong {
-      display: block;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--white);
-    }
-    .footer-brand-text span {
-      font-size: 12px;
-      color: #555570;
-    }
-    .footer-right {
-      text-align: right;
-    }
-    .footer-right a {
-      color: var(--cyan);
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .footer-copy {
-      font-size: 12px;
-      color: #444458;
-      margin-top: 4px;
-    }
-
-    /* ── DARK SECTION (hero-style panels) ───── */
-    .dark-band {
-      background: #07070f;
-      padding: 64px 36px;
-    }
-    .dark-band .wrap {
-      padding: 0;
-    }
-    .dark-band .sec-head h2 { color: var(--white); }
-    .dark-band .sec-head p  { color: #5a5a7a; }
-
-    /* ── RESPONSIVE ─────────────────────────── */
-    @media (max-width: 600px) {
-      .hero { padding: 60px 24px 70px; }
-      .wrap { padding: 56px 20px; }
-      .hero-stats { flex-direction: column; max-width: 240px; }
-      .hero-stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,.07); }
-      .hero-stat:last-child { border-bottom: none; }
-      .footer-inner { flex-direction: column; align-items: flex-start; }
-      .footer-right { text-align: left; }
-    }
-  </style>
 </head>
 <body>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<!-- ══════════════════ HERO ══════════════════ -->
+  body {
+    font-family: 'Segoe UI', system-ui, Arial, sans-serif;
+    background: #fff;
+    color: #1a1a2e;
+    overflow-x: hidden;
+  }
+
+  a { color: #69C9D0; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── HERO ──────────────────────────────── */
+  .hero {
+    position: relative;
+    background: #010101;
+    overflow: hidden;
+    padding: 80px 40px 90px;
+    text-align: center;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(105,201,208,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(105,201,208,.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .orb1 {
+    position: absolute;
+    width: 520px; height: 520px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(238,29,82,.32) 0%, transparent 70%);
+    top: -180px; left: -120px;
+    pointer-events: none;
+    filter: blur(60px);
+  }
+  .orb2 {
+    position: absolute;
+    width: 480px; height: 480px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(105,201,208,.28) 0%, transparent 70%);
+    bottom: -160px; right: -100px;
+    pointer-events: none;
+    filter: blur(60px);
+  }
+
+  .hero-inner { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(105,201,208,.35);
+    border-radius: 999px;
+    padding: 8px 20px;
+    margin-bottom: 36px;
+  }
+  .hero-badge img { width: 24px; height: 24px; object-fit: contain; }
+  .hero-badge span {
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #69C9D0;
+    font-weight: 600;
+  }
+
+  .hero h1 {
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    color: #ffffff;
+    margin-bottom: 22px;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(90deg, #EE1D52 0%, #69C9D0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 17px;
+    color: #9090a8;
+    max-width: 580px;
+    margin: 0 auto 44px;
+    line-height: 1.75;
+  }
+
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 16px;
+    overflow: hidden;
+    max-width: 540px;
+    margin: 0 auto 44px;
+  }
+  .hero-stat {
+    flex: 1;
+    padding: 20px 10px;
+    border-right: 1px solid rgba(255,255,255,.07);
+  }
+  .hero-stat:last-child { border-right: none; }
+  .hero-stat .val {
+    font-size: 26px;
+    font-weight: 800;
+    color: #ffffff;
+    display: block;
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+  .hero-stat .lbl {
+    font-size: 11px;
+    color: #8a8a9a;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .hero-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .hero-pills span {
+    background: rgba(105,201,208,.08);
+    border: 1px solid rgba(105,201,208,.28);
+    color: #69C9D0;
+    border-radius: 999px;
+    padding: 7px 18px;
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+
+  /* ── LAYOUT ────────────────────────────── */
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 72px 36px;
+  }
+
+  .sec-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .sec-line {
+    width: 4px;
+    min-height: 48px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #EE1D52 0%, #69C9D0 100%);
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .sec-head h2 {
+    font-size: 30px;
+    font-weight: 800;
+    color: #0d0d18;
+    letter-spacing: -0.4px;
+    line-height: 1.1;
+  }
+  .sec-head p {
+    font-size: 14px;
+    color: #8a8a9a;
+    margin-top: 5px;
+  }
+
+  hr.sep { border: none; border-top: 1px solid #f0f0f5; }
+
+  /* ── FEATURES ──────────────────────────── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  .feat {
+    border: 1px solid #ebebf2;
+    border-radius: 16px;
+    padding: 26px 22px;
+    background: #fff;
+    transition: box-shadow .2s, border-color .2s;
+  }
+  .feat:hover { box-shadow: 0 12px 36px rgba(0,0,0,.09); border-color: rgba(105,201,208,.4); }
+
+  .feat-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+  .feat-icon.red  { background: rgba(238,29,82,.1); }
+  .feat-icon.cyan { background: rgba(105,201,208,.12); }
+  .feat-icon.mix  { background: linear-gradient(135deg, rgba(238,29,82,.08), rgba(105,201,208,.1)); }
+
+  .feat h3 { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 8px; }
+  .feat p  { font-size: 13px; color: #686880; line-height: 1.65; }
+
+  /* ── TIMELINE ──────────────────────────── */
+  .timeline { display: flex; flex-direction: column; }
+
+  .tl-item {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 0 20px;
+    position: relative;
+  }
+
+  .tl-item:not(:last-child) .tl-left::after {
+    content: '';
+    position: absolute;
+    top: 68px;
+    left: 27px;
+    width: 2px;
+    height: calc(100% - 28px);
+    background: linear-gradient(180deg, #EE1D52 0%, #69C9D0 100%);
+    opacity: .2;
+  }
+
+  .tl-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    padding-top: 24px;
+  }
+
+  .tl-num {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: #010101;
+    color: #69C9D0;
+    font-weight: 800;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid rgba(105,201,208,.35);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  .tl-body { padding: 24px 24px 32px 0; }
+  .tl-body h4 { font-size: 16px; font-weight: 700; color: #0d0d18; margin-bottom: 8px; }
+  .tl-body p  { font-size: 13.5px; color: #5a5a72; line-height: 1.7; }
+
+  code {
+    background: #f4f4f8;
+    border: 1px solid #e0e0e8;
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+    color: #d63384;
+  }
+
+  /* ── REQUIREMENTS TABLE ──────────────── */
+  .req-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #e8e8f0;
+  }
+  .req-table thead tr { background: #010101; }
+  .req-table th {
+    padding: 14px 20px;
+    text-align: left;
+    color: #69C9D0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .req-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid #f0f0f5;
+    color: #3a3a52;
+    vertical-align: top;
+  }
+  .req-table tbody tr:last-child td { border-bottom: none; }
+  .req-table tbody tr:nth-child(even) td { background: #fafafe; }
+  .req-table tbody tr:hover td { background: #f4f4fb; }
+  .req-table td strong { color: #111; font-weight: 600; }
+
+  /* ── LIMITATIONS ─────────────────────── */
+  .lims {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .lim {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 20px;
+    border-radius: 14px;
+    border: 1px solid #ffe8b0;
+    background: linear-gradient(135deg, #fffdf4 0%, #fffbea 100%);
+  }
+
+  .lim-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: rgba(238,29,82,.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .lim h5 { font-size: 13.5px; font-weight: 700; color: #2a2a3a; margin-bottom: 5px; }
+  .lim p  { font-size: 12.5px; color: #6a6a7a; line-height: 1.6; }
+
+  /* ── LICENSE ─────────────────────────── */
+  .license-wrap { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .license-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #010101;
+    color: #69C9D0;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    border: 1px solid rgba(105,201,208,.3);
+  }
+  .license-badge .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #69C9D0;
+    display: inline-block;
+  }
+  .license-note { font-size: 13px; color: #8a8a9a; }
+
+  /* ── FOOTER ──────────────────────────── */
+  .footer { background: #010101; padding: 40px; }
+  .footer-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .footer-brand { display: flex; align-items: center; gap: 14px; }
+  .footer-brand img { width: 36px; height: 36px; border-radius: 8px; object-fit: contain; }
+  .footer-brand-text strong { display: block; font-size: 15px; font-weight: 700; color: #ffffff; }
+  .footer-brand-text span  { font-size: 12px; color: #555570; }
+  .footer-right { text-align: right; }
+  .footer-right a { color: #69C9D0; font-size: 13px; font-weight: 600; }
+  .footer-copy { font-size: 12px; color: #444458; margin-top: 4px; }
+</style>
+
+<!-- ══ HERO ══ -->
 <div class="hero">
   <div class="hero-grid"></div>
+  <div class="orb1"></div>
+  <div class="orb2"></div>
   <div class="hero-inner">
 
     <div class="hero-badge">
-      <img src="icon.png" alt="TikTok" />
+      <img src="icon.png" alt="TikTok" width="24" height="24" style="width:24px;height:24px;object-fit:contain;" />
       <span>Odoo 19 &nbsp;·&nbsp; Social Marketing</span>
     </div>
 
-    <h1>
-      Social <span class="grad">TikTok</span><br/>Integration
-    </h1>
+    <h1>Social <span class="grad">TikTok</span><br/>Integration</h1>
 
     <p class="hero-sub">
       Connect TikTok creator or business accounts to Odoo's Social Marketing app.
@@ -535,7 +422,7 @@
 
 <hr class="sep" />
 
-<!-- ══════════════════ FEATURES ══════════════════ -->
+<!-- ══ FEATURES ══ -->
 <div class="wrap">
   <div class="sec-head">
     <div class="sec-line"></div>
@@ -546,61 +433,52 @@
   </div>
 
   <div class="features-grid">
-
     <div class="feat">
       <div class="feat-icon red">🔗</div>
       <h3>Account Linking</h3>
       <p>Connect one or more TikTok creator or business accounts via OAuth 2.0 with a single click.</p>
     </div>
-
     <div class="feat">
       <div class="feat-icon cyan">🎬</div>
       <h3>Video Publishing</h3>
       <p>Upload and publish videos to TikTok directly from the Social Marketing post composer.</p>
     </div>
-
     <div class="feat">
       <div class="feat-icon mix">🔒</div>
       <h3>Privacy Control</h3>
       <p>Choose Public, Friends, Followers, or Private visibility per post before publishing.</p>
     </div>
-
     <div class="feat">
       <div class="feat-icon cyan">📺</div>
       <h3>Feed / Stream</h3>
       <p>Pull your latest published videos into the Social Marketing kanban feed view automatically.</p>
     </div>
-
     <div class="feat">
       <div class="feat-icon red">📊</div>
       <h3>Engagement Stats</h3>
       <p>Display likes, comments, shares, and views on each video card inside the feed.</p>
     </div>
-
     <div class="feat">
       <div class="feat-icon mix">👥</div>
       <h3>Account Statistics</h3>
       <p>Sync follower count and total likes to the Accounts dashboard for a quick overview.</p>
     </div>
-
     <div class="feat">
       <div class="feat-icon cyan">⚙️</div>
       <h3>Settings UI</h3>
       <p>Store TikTok app credentials securely in Odoo system parameters — no code changes needed.</p>
     </div>
-
     <div class="feat">
       <div class="feat-icon red">🔄</div>
       <h3>Token Refresh</h3>
       <p>Built-in access token refresh helper keeps accounts connected without re-authorising manually.</p>
     </div>
-
   </div>
 </div>
 
 <hr class="sep" />
 
-<!-- ══════════════════ REQUIREMENTS ══════════════════ -->
+<!-- ══ REQUIREMENTS ══ -->
 <div class="wrap">
   <div class="sec-head">
     <div class="sec-line"></div>
@@ -643,7 +521,7 @@
 
 <hr class="sep" />
 
-<!-- ══════════════════ INSTALLATION ══════════════════ -->
+<!-- ══ INSTALLATION ══ -->
 <div class="wrap">
   <div class="sec-head">
     <div class="sec-line"></div>
@@ -654,7 +532,6 @@
   </div>
 
   <div class="timeline">
-
     <div class="tl-item">
       <div class="tl-left"><div class="tl-num">1</div></div>
       <div class="tl-body">
@@ -662,7 +539,6 @@
         <p>Copy the <code>social_tiktok</code> folder into your custom addons directory and ensure it is listed in <code>addons_path</code> in your Odoo configuration file.</p>
       </div>
     </div>
-
     <div class="tl-item">
       <div class="tl-left"><div class="tl-num">2</div></div>
       <div class="tl-body">
@@ -670,7 +546,6 @@
         <p>Restart your Odoo server so the new module is discovered and its assets are loaded.</p>
       </div>
     </div>
-
     <div class="tl-item">
       <div class="tl-left"><div class="tl-num">3</div></div>
       <div class="tl-body">
@@ -678,13 +553,12 @@
         <p>Go to <strong>Apps</strong>, search for <strong>Social TikTok</strong>, and click <strong>Install</strong>.</p>
       </div>
     </div>
-
   </div>
 </div>
 
 <hr class="sep" />
 
-<!-- ══════════════════ CONFIGURATION ══════════════════ -->
+<!-- ══ CONFIGURATION ══ -->
 <div class="wrap">
   <div class="sec-head">
     <div class="sec-line"></div>
@@ -695,7 +569,6 @@
   </div>
 
   <div class="timeline">
-
     <div class="tl-item">
       <div class="tl-left"><div class="tl-num">1</div></div>
       <div class="tl-body">
@@ -709,7 +582,6 @@
         </p>
       </div>
     </div>
-
     <div class="tl-item">
       <div class="tl-left"><div class="tl-num">2</div></div>
       <div class="tl-body">
@@ -721,7 +593,6 @@
         </p>
       </div>
     </div>
-
     <div class="tl-item">
       <div class="tl-left"><div class="tl-num">3</div></div>
       <div class="tl-body">
@@ -733,13 +604,12 @@
         </p>
       </div>
     </div>
-
   </div>
 </div>
 
 <hr class="sep" />
 
-<!-- ══════════════════ LIMITATIONS ══════════════════ -->
+<!-- ══ LIMITATIONS ══ -->
 <div class="wrap">
   <div class="sec-head">
     <div class="sec-line"></div>
@@ -750,7 +620,6 @@
   </div>
 
   <div class="lims">
-
     <div class="lim">
       <div class="lim-icon">🎥</div>
       <div>
@@ -758,7 +627,6 @@
         <p>TikTok's Content Posting API does not support text-only or image posts.</p>
       </div>
     </div>
-
     <div class="lim">
       <div class="lim-icon">💬</div>
       <div>
@@ -766,7 +634,6 @@
         <p>Comment read/write requires the TikTok Research API, which has a separate approval process.</p>
       </div>
     </div>
-
     <div class="lim">
       <div class="lim-icon">📈</div>
       <div>
@@ -774,21 +641,19 @@
         <p>Trend calculation requires historical data not available in the standard API tier.</p>
       </div>
     </div>
-
     <div class="lim">
       <div class="lim-icon">⏱️</div>
       <div>
         <h5>Access token expiry</h5>
-        <p>Tokens expire after 24 hours; refresh tokens last 1 year. Re-authorise the account when prompted.</p>
+        <p>Tokens expire after 24 hours; refresh tokens last 1 year. Re-authorise when prompted.</p>
       </div>
     </div>
-
   </div>
 </div>
 
 <hr class="sep" />
 
-<!-- ══════════════════ LICENSE ══════════════════ -->
+<!-- ══ LICENSE ══ -->
 <div class="wrap" style="padding-bottom: 56px;">
   <div class="sec-head">
     <div class="sec-line"></div>
@@ -803,17 +668,16 @@
       LGPL-3
     </div>
     <p class="license-note">
-      Lesser General Public License v3 — you may use, modify, and distribute this module
-      under the terms of the LGPL-3.0 license.
+      Lesser General Public License v3 — use, modify, and distribute freely under its terms.
     </p>
   </div>
 </div>
 
-<!-- ══════════════════ FOOTER ══════════════════ -->
+<!-- ══ FOOTER ══ -->
 <div class="footer">
   <div class="footer-inner">
     <div class="footer-brand">
-      <img src="icon.png" alt="Social TikTok" />
+      <img src="icon.png" alt="Social TikTok" width="36" height="36" style="width:36px;height:36px;border-radius:8px;object-fit:contain;" />
       <div class="footer-brand-text">
         <strong>Social TikTok</strong>
         <span>for Odoo 19 · Social Marketing</span>
