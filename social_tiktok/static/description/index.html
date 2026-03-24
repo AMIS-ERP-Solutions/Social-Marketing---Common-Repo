@@ -3,244 +3,613 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Social TikTok</title>
+  <title>Social TikTok — Odoo 19</title>
   <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; color: #333; background: #fff; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Hero */
+    :root {
+      --black:  #010101;
+      --cyan:   #69C9D0;
+      --red:    #EE1D52;
+      --white:  #ffffff;
+      --gray:   #8a8a9a;
+      --surface:#0d0d18;
+      --card-bg:#13131f;
+      --border: rgba(105,201,208,.18);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, Arial, sans-serif;
+      background: #fff;
+      color: #1a1a2e;
+      overflow-x: hidden;
+    }
+
+    a { color: var(--cyan); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── HERO ────────────────────────────────── */
     .hero {
-      background: linear-gradient(135deg, #010101 0%, #1a1a2e 100%);
-      color: #fff;
-      padding: 60px 40px;
+      position: relative;
+      background: var(--black);
+      overflow: hidden;
+      padding: 80px 40px 90px;
       text-align: center;
     }
-    .hero .tiktok-badge {
+
+    /* animated gradient orbs */
+    .hero::before,
+    .hero::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      animation: drift 8s ease-in-out infinite alternate;
+    }
+    .hero::before {
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(238,29,82,.35) 0%, transparent 70%);
+      top: -180px; left: -120px;
+    }
+    .hero::after {
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(105,201,208,.30) 0%, transparent 70%);
+      bottom: -160px; right: -100px;
+      animation-delay: -4s;
+    }
+
+    @keyframes drift {
+      from { transform: translate(0, 0)   scale(1); }
+      to   { transform: translate(30px, 20px) scale(1.05); }
+    }
+
+    /* floating grid pattern */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(105,201,208,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(105,201,208,.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .hero-inner { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; }
+
+    /* pill badge */
+    .hero-badge {
       display: inline-flex;
       align-items: center;
-      gap: 14px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 50px;
-      padding: 10px 24px;
-      margin-bottom: 28px;
+      gap: 10px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(105,201,208,.35);
+      border-radius: 999px;
+      padding: 8px 20px;
+      margin-bottom: 36px;
     }
-    .hero .tiktok-badge img { width: 28px; height: 28px; }
-    .hero .tiktok-badge span { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #69C9D0; }
-    .hero h1 { font-size: 42px; font-weight: 800; margin: 0 0 14px; letter-spacing: -0.5px; }
-    .hero h1 span { color: #69C9D0; }
-    .hero p { font-size: 17px; color: #aaa; max-width: 600px; margin: 0 auto 36px; line-height: 1.65; }
-    .hero-pills { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-    .hero-pills span {
-      background: rgba(105,201,208,0.12);
-      border: 1px solid rgba(105,201,208,0.35);
-      color: #69C9D0;
-      border-radius: 20px;
-      padding: 6px 16px;
-      font-size: 13px;
+    .hero-badge img { width: 22px; height: 22px; }
+    .hero-badge span {
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--cyan);
+      font-weight: 600;
     }
 
-    /* Sections */
-    .section { padding: 56px 40px; max-width: 960px; margin: 0 auto; }
-    .section-title {
+    /* headline */
+    .hero h1 {
+      font-size: clamp(44px, 7vw, 72px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -1.5px;
+      color: var(--white);
+      margin-bottom: 22px;
+    }
+    .hero h1 .grad {
+      background: linear-gradient(90deg, var(--red) 0%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      color: #9090a8;
+      max-width: 580px;
+      margin: 0 auto 44px;
+      line-height: 1.75;
+    }
+
+    /* stat row */
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 44px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      overflow: hidden;
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-stat {
+      flex: 1;
+      padding: 20px 10px;
+      border-right: 1px solid rgba(255,255,255,.07);
+    }
+    .hero-stat:last-child { border-right: none; }
+    .hero-stat .val {
       font-size: 26px;
-      font-weight: 700;
-      color: #111;
-      margin: 0 0 8px;
-      border-left: 4px solid #EE1D52;
-      padding-left: 14px;
+      font-weight: 800;
+      color: var(--white);
+      display: block;
+      line-height: 1;
+      margin-bottom: 5px;
     }
-    .section-sub { color: #777; font-size: 14px; margin: 0 0 36px 18px; }
-    .divider { border: none; border-top: 1px solid #f0f0f0; margin: 0; }
+    .hero-stat .lbl {
+      font-size: 11px;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
-    /* Features grid */
+    /* pills */
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .hero-pills span {
+      background: rgba(105,201,208,.08);
+      border: 1px solid rgba(105,201,208,.28);
+      color: var(--cyan);
+      border-radius: 999px;
+      padding: 7px 18px;
+      font-size: 12.5px;
+      font-weight: 500;
+    }
+
+    /* ── SECTION SCAFFOLD ───────────────────── */
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 72px 36px;
+    }
+
+    .sec-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .sec-line {
+      width: 4px;
+      height: 48px;
+      border-radius: 4px;
+      background: linear-gradient(180deg, var(--red) 0%, var(--cyan) 100%);
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+    .sec-head h2 {
+      font-size: 30px;
+      font-weight: 800;
+      color: #0d0d18;
+      letter-spacing: -.4px;
+      line-height: 1.1;
+    }
+    .sec-head p {
+      font-size: 14px;
+      color: var(--gray);
+      margin-top: 5px;
+    }
+
+    hr.sep {
+      border: none;
+      border-top: 1px solid #f0f0f5;
+    }
+
+    /* ── FEATURES ───────────────────────────── */
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 18px;
     }
-    .feature-card {
-      border: 1px solid #ececec;
-      border-radius: 12px;
-      padding: 24px 20px;
-      transition: box-shadow .2s;
-    }
-    .feature-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.08); }
-    .feature-icon {
-      width: 42px; height: 42px;
-      background: linear-gradient(135deg, #EE1D52, #69C9D0);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 14px;
-      font-size: 20px;
-    }
-    .feature-card h3 { font-size: 15px; font-weight: 700; margin: 0 0 8px; color: #111; }
-    .feature-card p { font-size: 13px; color: #666; margin: 0; line-height: 1.6; }
 
-    /* Steps */
-    .steps { counter-reset: step; display: flex; flex-direction: column; gap: 20px; }
-    .step {
-      display: flex; gap: 18px; align-items: flex-start;
-      padding: 22px 24px;
-      border: 1px solid #ececec;
-      border-radius: 12px;
+    .feat {
+      border: 1px solid #ebebf2;
+      border-radius: 16px;
+      padding: 26px 22px;
+      background: #fff;
+      position: relative;
+      overflow: hidden;
+      transition: transform .2s, box-shadow .2s, border-color .2s;
     }
-    .step-num {
-      counter-increment: step;
-      min-width: 36px; height: 36px;
-      background: #010101;
-      color: #69C9D0;
-      border-radius: 50%;
+    .feat::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(238,29,82,.04) 0%, rgba(105,201,208,.04) 100%);
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    .feat:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(0,0,0,.09); border-color: rgba(105,201,208,.4); }
+    .feat:hover::before { opacity: 1; }
+
+    .feat-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 15px;
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+    .feat-icon.red  { background: rgba(238,29,82,.1); }
+    .feat-icon.cyan { background: rgba(105,201,208,.12); }
+    .feat-icon.mix  { background: linear-gradient(135deg, rgba(238,29,82,.08), rgba(105,201,208,.1)); }
+
+    .feat h3 { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 8px; }
+    .feat p  { font-size: 13px; color: #686880; line-height: 1.65; }
+
+    /* ── TIMELINE (install / config) ────────── */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+
+    .tl-item {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 0 20px;
+      position: relative;
+    }
+
+    /* vertical connector */
+    .tl-item:not(:last-child) .tl-left::after {
+      content: '';
+      position: absolute;
+      top: 52px;
+      left: 27px;
+      width: 2px;
+      height: calc(100% - 10px);
+      background: linear-gradient(180deg, var(--red) 0%, var(--cyan) 100%);
+      opacity: .2;
+    }
+
+    .tl-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      padding-top: 24px;
+    }
+
+    .tl-num {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--black);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid rgba(105,201,208,.35);
+      flex-shrink: 0;
+      z-index: 1;
+    }
+
+    .tl-body {
+      padding: 24px 24px 32px 0;
+    }
+    .tl-body h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0d0d18;
+      margin-bottom: 8px;
+    }
+    .tl-body p {
+      font-size: 13.5px;
+      color: #5a5a72;
+      line-height: 1.7;
+    }
+
+    code {
+      background: #f4f4f8;
+      border: 1px solid #e0e0e8;
+      border-radius: 5px;
+      padding: 2px 7px;
+      font-size: 12px;
+      font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+      color: #d63384;
+    }
+
+    /* ── REQUIREMENTS TABLE ─────────────────── */
+    .req-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 14px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #e8e8f0;
+    }
+    .req-table thead tr {
+      background: var(--black);
+    }
+    .req-table th {
+      padding: 14px 20px;
+      text-align: left;
+      color: var(--cyan);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .req-table td {
+      padding: 14px 20px;
+      border-bottom: 1px solid #f0f0f5;
+      color: #3a3a52;
+      vertical-align: top;
+    }
+    .req-table tbody tr:last-child td { border-bottom: none; }
+    .req-table tbody tr:nth-child(even) td { background: #fafafe; }
+    .req-table tbody tr:hover td { background: #f4f4fb; }
+    .req-table td strong { color: #111; font-weight: 600; }
+
+    /* ── LIMITATIONS ────────────────────────── */
+    .lims {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .lim {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 20px;
+      border-radius: 14px;
+      border: 1px solid #ffe8b0;
+      background: linear-gradient(135deg, #fffdf4 0%, #fffbea 100%);
+    }
+
+    .lim-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: rgba(238,29,82,.08);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
       flex-shrink: 0;
     }
-    .step-num::before { content: counter(step); }
-    .step h4 { font-size: 14px; font-weight: 700; margin: 0 0 6px; color: #111; }
-    .step p { font-size: 13px; color: #666; margin: 0; line-height: 1.6; }
-    code {
-      background: #f4f4f4;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      padding: 1px 6px;
-      font-size: 12px;
-      font-family: 'Courier New', monospace;
-    }
 
-    /* Requirements table */
-    .req-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .req-table th {
-      background: #010101; color: #69C9D0;
-      padding: 12px 16px; text-align: left;
-      font-weight: 600; font-size: 12px; letter-spacing: .5px; text-transform: uppercase;
-    }
-    .req-table td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; color: #444; }
-    .req-table tr:last-child td { border-bottom: none; }
-    .req-table tr:hover td { background: #fafafa; }
+    .lim h5 { font-size: 13.5px; font-weight: 700; color: #2a2a3a; margin-bottom: 5px; }
+    .lim p  { font-size: 12.5px; color: #6a6a7a; line-height: 1.6; }
 
-    /* Limitations */
-    .limitations { display: flex; flex-direction: column; gap: 12px; }
-    .limitation {
-      display: flex; align-items: flex-start; gap: 14px;
-      padding: 16px 20px;
-      background: #fffbf0;
-      border: 1px solid #ffe58f;
-      border-radius: 10px;
+    /* ── LICENSE ────────────────────────────── */
+    .license-wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
     }
-    .limitation .lim-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
-    .limitation strong { font-size: 13px; color: #333; display: block; margin-bottom: 4px; }
-    .limitation span { font-size: 13px; color: #777; line-height: 1.5; }
-
-    /* License */
     .license-badge {
-      display: inline-block;
-      background: #f4f4f4;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 8px 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--black);
+      color: var(--cyan);
+      border-radius: 8px;
+      padding: 10px 20px;
       font-size: 14px;
-      font-weight: 600;
-      color: #444;
+      font-weight: 700;
+      border: 1px solid rgba(105,201,208,.3);
+    }
+    .license-badge .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      display: inline-block;
+    }
+    .license-note {
+      font-size: 13px;
+      color: var(--gray);
     }
 
-    /* Footer */
+    /* ── FOOTER ─────────────────────────────── */
     .footer {
-      background: #010101;
-      color: #777;
-      text-align: center;
-      padding: 28px 20px;
-      font-size: 13px;
+      background: var(--black);
+      padding: 40px 40px;
     }
-    .footer strong { color: #69C9D0; }
+    .footer-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .footer-brand img {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+    }
+    .footer-brand-text strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .footer-brand-text span {
+      font-size: 12px;
+      color: #555570;
+    }
+    .footer-right {
+      text-align: right;
+    }
+    .footer-right a {
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .footer-copy {
+      font-size: 12px;
+      color: #444458;
+      margin-top: 4px;
+    }
+
+    /* ── DARK SECTION (hero-style panels) ───── */
+    .dark-band {
+      background: #07070f;
+      padding: 64px 36px;
+    }
+    .dark-band .wrap {
+      padding: 0;
+    }
+    .dark-band .sec-head h2 { color: var(--white); }
+    .dark-band .sec-head p  { color: #5a5a7a; }
+
+    /* ── RESPONSIVE ─────────────────────────── */
+    @media (max-width: 600px) {
+      .hero { padding: 60px 24px 70px; }
+      .wrap { padding: 56px 20px; }
+      .hero-stats { flex-direction: column; max-width: 240px; }
+      .hero-stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,.07); }
+      .hero-stat:last-child { border-bottom: none; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+      .footer-right { text-align: left; }
+    }
   </style>
 </head>
 <body>
 
-<!-- ═══════════════════ HERO ═══════════════════ -->
+<!-- ══════════════════ HERO ══════════════════ -->
 <div class="hero">
-  <div class="tiktok-badge">
-    <img src="icon.svg" alt="TikTok" />
-    <span>Odoo 19 · Social Marketing</span>
-  </div>
-  <h1>Social <span>TikTok</span></h1>
-  <p>
-    Connect your TikTok creator or business account to Odoo's Social Marketing app.
-    Schedule video posts, monitor engagement, and manage all your social channels
-    from one place.
-  </p>
-  <div class="hero-pills">
-    <span>OAuth 2.0</span>
-    <span>Video Publishing</span>
-    <span>Feed / Stream</span>
-    <span>Engagement Stats</span>
-    <span>Privacy Controls</span>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+
+    <div class="hero-badge">
+      <img src="icon.svg" alt="TikTok" />
+      <span>Odoo 19 &nbsp;·&nbsp; Social Marketing</span>
+    </div>
+
+    <h1>
+      Social <span class="grad">TikTok</span><br/>Integration
+    </h1>
+
+    <p class="hero-sub">
+      Connect TikTok creator or business accounts to Odoo's Social Marketing app.
+      Schedule videos, stream your feed, and track engagement — all from one place.
+    </p>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="val">OAuth</span>
+        <span class="lbl">2.0 Auth</span>
+      </div>
+      <div class="hero-stat">
+        <span class="val">8</span>
+        <span class="lbl">Features</span>
+      </div>
+      <div class="hero-stat">
+        <span class="val">19.0</span>
+        <span class="lbl">Odoo Ver.</span>
+      </div>
+      <div class="hero-stat">
+        <span class="val">LGPL</span>
+        <span class="lbl">License</span>
+      </div>
+    </div>
+
+    <div class="hero-pills">
+      <span>OAuth 2.0</span>
+      <span>Video Publishing</span>
+      <span>Feed / Stream</span>
+      <span>Engagement Stats</span>
+      <span>Privacy Controls</span>
+      <span>Token Refresh</span>
+    </div>
+
   </div>
 </div>
 
-<hr class="divider" />
+<hr class="sep" />
 
-<!-- ═══════════════════ FEATURES ═══════════════════ -->
-<div class="section">
-  <h2 class="section-title">Features</h2>
-  <p class="section-sub">Everything you need to manage TikTok from Odoo</p>
+<!-- ══════════════════ FEATURES ══════════════════ -->
+<div class="wrap">
+  <div class="sec-head">
+    <div class="sec-line"></div>
+    <div>
+      <h2>What's Included</h2>
+      <p>Everything you need to manage TikTok from inside Odoo</p>
+    </div>
+  </div>
+
   <div class="features-grid">
 
-    <div class="feature-card">
-      <div class="feature-icon">🔗</div>
+    <div class="feat">
+      <div class="feat-icon red">🔗</div>
       <h3>Account Linking</h3>
       <p>Connect one or more TikTok creator or business accounts via OAuth 2.0 with a single click.</p>
     </div>
 
-    <div class="feature-card">
-      <div class="feature-icon">🎬</div>
+    <div class="feat">
+      <div class="feat-icon cyan">🎬</div>
       <h3>Video Publishing</h3>
       <p>Upload and publish videos to TikTok directly from the Social Marketing post composer.</p>
     </div>
 
-    <div class="feature-card">
-      <div class="feature-icon">🔒</div>
+    <div class="feat">
+      <div class="feat-icon mix">🔒</div>
       <h3>Privacy Control</h3>
       <p>Choose Public, Friends, Followers, or Private visibility per post before publishing.</p>
     </div>
 
-    <div class="feature-card">
-      <div class="feature-icon">📺</div>
+    <div class="feat">
+      <div class="feat-icon cyan">📺</div>
       <h3>Feed / Stream</h3>
       <p>Pull your latest published videos into the Social Marketing kanban feed view automatically.</p>
     </div>
 
-    <div class="feature-card">
-      <div class="feature-icon">📊</div>
+    <div class="feat">
+      <div class="feat-icon red">📊</div>
       <h3>Engagement Stats</h3>
-      <p>Display likes, comments, shares, and views on each video card in the feed.</p>
+      <p>Display likes, comments, shares, and views on each video card inside the feed.</p>
     </div>
 
-    <div class="feature-card">
-      <div class="feature-icon">👥</div>
+    <div class="feat">
+      <div class="feat-icon mix">👥</div>
       <h3>Account Statistics</h3>
       <p>Sync follower count and total likes to the Accounts dashboard for a quick overview.</p>
     </div>
 
-    <div class="feature-card">
-      <div class="feature-icon">⚙️</div>
+    <div class="feat">
+      <div class="feat-icon cyan">⚙️</div>
       <h3>Settings UI</h3>
-      <p>Store your TikTok app credentials securely in Odoo system parameters — no code changes needed.</p>
+      <p>Store TikTok app credentials securely in Odoo system parameters — no code changes needed.</p>
     </div>
 
-    <div class="feature-card">
-      <div class="feature-icon">🔄</div>
+    <div class="feat">
+      <div class="feat-icon red">🔄</div>
       <h3>Token Refresh</h3>
-      <p>Built-in access token refresh helper keeps your accounts connected without re-authorising manually.</p>
+      <p>Built-in access token refresh helper keeps accounts connected without re-authorising manually.</p>
     </div>
 
   </div>
 </div>
 
-<hr class="divider" />
+<hr class="sep" />
 
-<!-- ═══════════════════ REQUIREMENTS ═══════════════════ -->
-<div class="section">
-  <h2 class="section-title">Requirements</h2>
-  <p class="section-sub">What you need before installing</p>
+<!-- ══════════════════ REQUIREMENTS ══════════════════ -->
+<div class="wrap">
+  <div class="sec-head">
+    <div class="sec-line"></div>
+    <div>
+      <h2>Requirements</h2>
+      <p>What you need before installing</p>
+    </div>
+  </div>
+
   <table class="req-table">
     <thead>
       <tr>
@@ -262,7 +631,7 @@
         <td>Creator or Business account</td>
       </tr>
       <tr>
-        <td><strong>TikTok app</strong></td>
+        <td><strong>TikTok Developer App</strong></td>
         <td>
           Registered at <a href="https://developers.tiktok.com" target="_blank">developers.tiktok.com</a>
           with <strong>Login Kit</strong> and <strong>Content Posting API</strong> enabled
@@ -272,72 +641,91 @@
   </table>
 </div>
 
-<hr class="divider" />
+<hr class="sep" />
 
-<!-- ═══════════════════ INSTALLATION ═══════════════════ -->
-<div class="section">
-  <h2 class="section-title">Installation</h2>
-  <p class="section-sub">Get up and running in minutes</p>
-  <div class="steps">
-    <div class="step">
-      <div class="step-num"></div>
-      <div>
+<!-- ══════════════════ INSTALLATION ══════════════════ -->
+<div class="wrap">
+  <div class="sec-head">
+    <div class="sec-line"></div>
+    <div>
+      <h2>Installation</h2>
+      <p>Get up and running in minutes</p>
+    </div>
+  </div>
+
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-num">1</div></div>
+      <div class="tl-body">
         <h4>Add to addons path</h4>
         <p>Copy the <code>social_tiktok</code> folder into your custom addons directory and ensure it is listed in <code>addons_path</code> in your Odoo configuration file.</p>
       </div>
     </div>
-    <div class="step">
-      <div class="step-num"></div>
-      <div>
+
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-num">2</div></div>
+      <div class="tl-body">
         <h4>Restart the server</h4>
-        <p>Restart your Odoo server to pick up the new module.</p>
+        <p>Restart your Odoo server so the new module is discovered and its assets are loaded.</p>
       </div>
     </div>
-    <div class="step">
-      <div class="step-num"></div>
-      <div>
+
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-num">3</div></div>
+      <div class="tl-body">
         <h4>Install from Apps</h4>
         <p>Go to <strong>Apps</strong>, search for <strong>Social TikTok</strong>, and click <strong>Install</strong>.</p>
       </div>
     </div>
+
   </div>
 </div>
 
-<hr class="divider" />
+<hr class="sep" />
 
-<!-- ═══════════════════ CONFIGURATION ═══════════════════ -->
-<div class="section">
-  <h2 class="section-title">Configuration</h2>
-  <p class="section-sub">Three quick steps to connect your TikTok account</p>
-  <div class="steps">
-    <div class="step">
-      <div class="step-num"></div>
-      <div>
+<!-- ══════════════════ CONFIGURATION ══════════════════ -->
+<div class="wrap">
+  <div class="sec-head">
+    <div class="sec-line"></div>
+    <div>
+      <h2>Configuration</h2>
+      <p>Three quick steps to connect your TikTok account</p>
+    </div>
+  </div>
+
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-num">1</div></div>
+      <div class="tl-body">
         <h4>Register a TikTok App</h4>
         <p>
           Log in to <a href="https://developers.tiktok.com" target="_blank">developers.tiktok.com</a>,
-          create a new app, and add <strong>Login Kit</strong> and <strong>Content Posting API</strong>.
-          In <em>App settings → Redirect URI</em> add
+          create a new app, and enable <strong>Login Kit</strong> and <strong>Content Posting API</strong>.
+          Under <em>App Settings → Redirect URI</em> add
           <code>https://&lt;your-odoo-domain&gt;/social_tiktok/callback</code>.
           Note your <strong>Client Key</strong> and <strong>Client Secret</strong>.
         </p>
       </div>
     </div>
-    <div class="step">
-      <div class="step-num"></div>
-      <div>
+
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-num">2</div></div>
+      <div class="tl-body">
         <h4>Enter credentials in Odoo</h4>
         <p>
-          Go to <strong>Settings → Social Marketing</strong>, scroll to the
-          <em>Developer Accounts</em> section, enter your <strong>TikTok Client Key</strong>
+          Navigate to <strong>Settings → Social Marketing</strong>, scroll to
+          <em>Developer Accounts</em>, enter your <strong>TikTok Client Key</strong>
           and <strong>Client Secret</strong>, then save.
         </p>
       </div>
     </div>
-    <div class="step">
-      <div class="step-num"></div>
-      <div>
-        <h4>Connect your TikTok account</h4>
+
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-num">3</div></div>
+      <div class="tl-body">
+        <h4>Authorise your TikTok account</h4>
         <p>
           Open <strong>Social Marketing → Accounts</strong>, click the <strong>TikTok</strong>
           media card → <strong>Add Account</strong>, and authorise the app on TikTok.
@@ -345,65 +733,97 @@
         </p>
       </div>
     </div>
+
   </div>
 </div>
 
-<hr class="divider" />
+<hr class="sep" />
 
-<!-- ═══════════════════ KNOWN LIMITATIONS ═══════════════════ -->
-<div class="section">
-  <h2 class="section-title">Known Limitations</h2>
-  <p class="section-sub">Platform API restrictions to be aware of</p>
-  <div class="limitations">
+<!-- ══════════════════ LIMITATIONS ══════════════════ -->
+<div class="wrap">
+  <div class="sec-head">
+    <div class="sec-line"></div>
+    <div>
+      <h2>Known Limitations</h2>
+      <p>Platform API restrictions to be aware of</p>
+    </div>
+  </div>
 
-    <div class="limitation">
+  <div class="lims">
+
+    <div class="lim">
       <div class="lim-icon">🎥</div>
       <div>
-        <strong>Video-only posts</strong>
-        <span>TikTok's Content Posting API does not support text-only or image posts.</span>
+        <h5>Video-only posts</h5>
+        <p>TikTok's Content Posting API does not support text-only or image posts.</p>
       </div>
     </div>
 
-    <div class="limitation">
+    <div class="lim">
       <div class="lim-icon">💬</div>
       <div>
-        <strong>No in-app comment management</strong>
-        <span>Comment read/write requires the TikTok Research API (separate approval process).</span>
+        <h5>No in-app comment management</h5>
+        <p>Comment read/write requires the TikTok Research API, which has a separate approval process.</p>
       </div>
     </div>
 
-    <div class="limitation">
+    <div class="lim">
       <div class="lim-icon">📈</div>
       <div>
-        <strong>No engagement trends</strong>
-        <span>Trend calculation requires historical data not available in the standard API.</span>
+        <h5>No engagement trends</h5>
+        <p>Trend calculation requires historical data not available in the standard API tier.</p>
       </div>
     </div>
 
-    <div class="limitation">
+    <div class="lim">
       <div class="lim-icon">⏱️</div>
       <div>
-        <strong>Access token expiry</strong>
-        <span>Tokens expire after 24 hours; refresh tokens last 1 year. Re-authorise the account when prompted.</span>
+        <h5>Access token expiry</h5>
+        <p>Tokens expire after 24 hours; refresh tokens last 1 year. Re-authorise the account when prompted.</p>
       </div>
     </div>
 
   </div>
 </div>
 
-<hr class="divider" />
+<hr class="sep" />
 
-<!-- ═══════════════════ LICENSE ═══════════════════ -->
-<div class="section" style="padding-bottom: 20px;">
-  <h2 class="section-title">License</h2>
-  <p class="section-sub">Open source</p>
-  <span class="license-badge">LGPL-3</span>
+<!-- ══════════════════ LICENSE ══════════════════ -->
+<div class="wrap" style="padding-bottom: 56px;">
+  <div class="sec-head">
+    <div class="sec-line"></div>
+    <div>
+      <h2>License</h2>
+      <p>Open source and freely modifiable</p>
+    </div>
+  </div>
+  <div class="license-wrap">
+    <div class="license-badge">
+      <span class="dot"></span>
+      LGPL-3
+    </div>
+    <p class="license-note">
+      Lesser General Public License v3 — you may use, modify, and distribute this module
+      under the terms of the LGPL-3.0 license.
+    </p>
+  </div>
 </div>
 
-<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<!-- ══════════════════ FOOTER ══════════════════ -->
 <div class="footer">
-  Developed by <strong>Black Monkey</strong> &nbsp;·&nbsp;
-  <a href="https://amis.lk/" style="color:#69C9D0;">amis.lk</a>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="icon.svg" alt="Social TikTok" />
+      <div class="footer-brand-text">
+        <strong>Social TikTok</strong>
+        <span>for Odoo 19 · Social Marketing</span>
+      </div>
+    </div>
+    <div class="footer-right">
+      <a href="https://amis.lk/" target="_blank">amis.lk</a>
+      <p class="footer-copy">Developed by Black Monkey &nbsp;·&nbsp; LGPL-3</p>
+    </div>
+  </div>
 </div>
 
 </body>
