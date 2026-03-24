@@ -13,6 +13,9 @@
         'views/social_stream_post_views.xml',
         'views/res_config_settings_views.xml',
     ],
+    'images': [
+        'static/description/banner.png',
+    ],
     'auto_install': False,
     'installable': True,
     'assets': {
