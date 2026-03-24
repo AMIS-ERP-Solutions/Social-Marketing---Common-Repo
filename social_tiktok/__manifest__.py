@@ -25,7 +25,7 @@
             'social_tiktok/static/src/xml/**/*',
         ],
     },
-    'author': 'AMIS Web Solutions',
+    'author': 'Black Monkey',
     'website': 'https://amis.lk/',
     'license': 'LGPL-3',
 }
